@@ -1,10 +1,12 @@
 import {Client} from "discord.js";
 import ready from "../listeners/ready";
 import interactionCreate from "../listeners/interactionCreate";
+import messageCreate from "../listeners/messageCreate";
 
-const LISTENERS : any = [
+const LISTENERS: any = [
     ready,
-    interactionCreate
+    interactionCreate,
+    messageCreate
 ]
 
 export default (client: Client): void => {

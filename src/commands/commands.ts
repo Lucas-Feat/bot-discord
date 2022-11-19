@@ -1,10 +1,10 @@
-import {Command} from "../types/command";
-import {Hello} from "./hello";
-import {Gommet} from "./gommet";
-import {Clear} from "./clear";
+import {Command} from '../types/command';
+import {HelloCommand} from './hello.command';
+import {StickerCommand} from './sticker.command';
+import {ClearCommand} from './clear.command';
 
 export const Commands: Command[] = [
-    Hello,
-    Gommet,
-    Clear
+    HelloCommand,
+    StickerCommand,
+    ClearCommand
 ];

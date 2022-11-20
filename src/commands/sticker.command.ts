@@ -12,10 +12,10 @@ import {
     TextChannel,
     User
 } from 'discord.js';
-import {Command} from '../types/command';
-import {findStickerByValue, Sticker, stickers} from '../types/sticker';
+import {Command} from '../types/Command';
+import {findStickerByValue, Sticker, stickers} from '../types/Sticker';
 import {clearMessage} from './clear.command';
-import {addSticker, getScore} from '../firebase/storage';
+import {addSticker, getScore} from '../service/sticker.service';
 import {findUserById} from '../utils/utils';
 
 export let stickerSelectedMember: User;
@@ -30,12 +30,14 @@ export const StickerCommand: Command = {
             .setCustomId('member-menu')
             .setPlaceholder('Sélectionner un membre :');
 
-        client.users.cache.map((user: User) => {
-            menu.addOptions(new SelectMenuOptionBuilder({
-                label: user.username,
-                value: user.id
-            }));
-        });
+        client.users.cache
+            .filter(user => user != client.user)
+            .map((user: User) => {
+                menu.addOptions(new SelectMenuOptionBuilder({
+                    label: user.username,
+                    value: user.id
+                }));
+            });
 
         await interaction.reply({
             components: [new ActionRowBuilder<SelectMenuBuilder>().addComponents(menu)]
@@ -74,7 +76,7 @@ export async function attributeSticker(client: Client, interaction: SelectMenuIn
         .setDescription(await displayScore(client, sticker));
 
     await (interaction.channel as TextChannel).send({
-        embeds: [embed]
+        embeds: [embed],
     });
 }
 
@@ -90,7 +92,7 @@ async function displayScore(client: Client, sticker: Sticker): Promise<string> {
             return `${user.username} : ${stickerDisplay.join(' ')}`;
         }));
 
-    return `${stickerSelectedMember.username} a reçu une nouvelle gommette ${sticker.emoji} !\n\n`
+    return `@${stickerSelectedMember.username} a reçu une nouvelle gommette ${sticker.emoji} !\n\n`
         + `Nouveau score : \n`
         + `${scores.join('\n')}`;
 }

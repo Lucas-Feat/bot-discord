@@ -7,7 +7,7 @@ import {
     Message,
     SelectMenuInteraction
 } from 'discord.js';
-import {Command} from '../types/command';
+import {Command} from '../types/Command';
 
 export const ClearCommand: Command = {
     name: 'clear',

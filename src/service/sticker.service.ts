@@ -1,7 +1,7 @@
 import {firestore} from '../index';
 import {Client, User} from 'discord.js';
 import moment from 'moment';
-import {Sticker} from '../types/sticker';
+import {Sticker} from '../types/Sticker';
 
 const STICKER_COLLECTION: string = 'stickers';
 const MEMBER_COLLECTION: string = 'members';
@@ -46,3 +46,5 @@ export async function getScore(): Promise<FirebaseFirestore.QuerySnapshot<Fireba
         console.log(e);
     }
 }
+
+

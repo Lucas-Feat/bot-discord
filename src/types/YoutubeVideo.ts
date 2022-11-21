@@ -25,5 +25,18 @@ export const videoConverter = {
             publishedAt: moment(data.snippet.publishedAt),
             url: `https://www.youtube.com/watch?v=${data.id.videoId}`
         });
+    },
+
+    fromXML: (data: any[]) => {
+        const subData = data.find((element: any) => element.name === 'media:group').elements;
+        return new YoutubeVideo({
+            id: data.find(data => data.name === 'yt:videoId').elements[0].text,
+            title: subData.find((data: any) => data.name === 'media:title').elements[0].text,
+            description: subData.find((data: any) => data.name === 'media:description').elements[0].text,
+            thumbnails: subData.find((data: any) => data.name === 'media:thumbnail').attributes.url,
+            channelTitle: data.find(data => data.name === 'author').elements[0].elements[0].text,
+            publishedAt: moment(data.find(data => data.name === 'published').elements[0].text),
+            url: data.find(data => data.name === 'link').attributes.href,
+        });
     }
 };

@@ -1,64 +1,42 @@
-import {Channel, Client, Colors, EmbedBuilder, TextChannel} from 'discord.js';
-import moment from 'moment';
+import {Client, Colors, EmbedBuilder, TextChannel} from 'discord.js';
+import moment, {Moment} from 'moment';
 import {default as config} from '../config.json';
 import axios from 'axios';
 import {videoConverter, YoutubeVideo} from '../types/YoutubeVideo';
 import {firestore} from '../index';
-import {findChannelById} from '../utils/utils';
+import {convertXmlToArray, findChannelById} from '../utils/utils';
 
 const YOUTUBE_CHANNEL_COLLECTION: string = 'youtube-channels';
 
 export async function handleYoutubeUploads(client: Client) {
-    let stopOnError: boolean = false;
-    const interval = setInterval(async () => {
+    setInterval(async () => {
         const channelsIds = await getYoutubeChannelIds();
-        const publishedAfter: string = moment().add(-config.youtubeConfig.interval, 'ms').toISOString();
-        for (let channelId in channelsIds) {
-            await axios
-                .get(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&maxResults=1&publishedAfter=${publishedAfter}&key=${config.youtubeConfig.googleAPIKey}`)
-                .then(async res => {
-                    if (res.data.pageInfo.totalResults > 0) {
-                        await displayNewYoutubeVideo(client, res.data.items);
-                    }
-                })
-                .catch(async function (error) {
-                    if (error.response.status === 403) {
-                        clearInterval(interval);
-                        stopOnError = true;
-                    }
-                });
-            if (stopOnError) {
-                const embed = new EmbedBuilder()
-                    .setColor(Colors.Red)
-                    .setTitle('Le quota de recherches via l\'API Youtube est atteint pour aujourd\'hui 😬')
-                    .setDescription(`Quota atteint le ${moment().format('DD-MM-YYYY à HH:mm').toString()}`);
+        const publishedAfter: Moment = moment().add(-config.youtubeConfig.interval, 'ms');
 
-                const channel = findChannelById(client, config.channels.status) as TextChannel;
-                await channel.send({
-                    embeds: [embed]
-                });
-                break;
-            }
-        }
+        const data = await axios
+            .get(`https://www.youtube.com/feeds/videos.xml?channel_id=${channelsIds[0]}`);
+
+        const elements: any[] = convertXmlToArray(data);
+        const videos: YoutubeVideo[] = elements
+            .map((element: any) => videoConverter.fromXML(element))
+            .filter((video: YoutubeVideo) => video.publishedAt.isAfter(publishedAfter));
+
+        videos.map(async (video: YoutubeVideo) => await displayNewYoutubeVideo(client, video));
     }, config.youtubeConfig.interval);
-
 }
 
-async function displayNewYoutubeVideo(client: Client, items: any[]) {
-    const videos: YoutubeVideo[] = items.map(item => videoConverter.fromJSON(item));
-    const channel: TextChannel = client.channels.cache.find((channel: Channel) => channel.id === config.channels.videos) as TextChannel;
-    for (const video of videos) {
-        const embed: EmbedBuilder = new EmbedBuilder()
-            .setColor(Colors.Red)
-            .setURL(video.url)
-            .setTitle(`📣 Nouvelle vidéo de ${video.channelTitle} : ${video.title} !`)
-            .setDescription(video.description)
-            .setImage(video.thumbnails);
+async function displayNewYoutubeVideo(client: Client, video: YoutubeVideo) {
+    const channel: TextChannel = findChannelById(client, config.channels.videos) as TextChannel;
+    const embed: EmbedBuilder = new EmbedBuilder()
+        .setColor(Colors.Red)
+        .setURL(video.url)
+        .setTitle(`📣 Nouvelle vidéo de ${video.channelTitle} : ${video.title} !`)
+        .setDescription(video.description)
+        .setImage(video.thumbnails);
 
-        await channel.send({
-            embeds: [embed]
-        });
-    }
+    await channel.send({
+        embeds: [embed]
+    });
 }
 
 export async function saveNewYoutubeChannel(channelId: string) {

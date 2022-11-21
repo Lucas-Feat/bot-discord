@@ -5,6 +5,7 @@ import axios from 'axios';
 import {videoConverter, YoutubeVideo} from '../types/YoutubeVideo';
 import {firestore} from '../index';
 import {convertXmlToArray, findChannelById} from '../utils/utils';
+import {channelConverter, YoutubeChannel} from '../types/YoutubeChannel';
 
 const YOUTUBE_CHANNEL_COLLECTION: string = 'youtube-channels';
 
@@ -61,4 +62,10 @@ export async function getYoutubeChannelIds() {
     } catch (e) {
         console.log(e);
     }
+}
+
+export async function getYoutubeChannel(channelId: string): Promise<YoutubeChannel> {
+    return await axios
+        .get(`https://youtube.googleapis.com/youtube/v3/channels?part=snippet%2CcontentDetails&id=${channelId}&key=${config.youtubeConfig.googleAPIKey}`)
+        .then(res => channelConverter.fromJSON(res.data.items[0]));
 }

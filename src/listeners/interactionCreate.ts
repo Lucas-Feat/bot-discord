@@ -1,6 +1,7 @@
 import {Client, CommandInteraction, Interaction} from 'discord.js';
 import {Commands} from '../commands/commands';
 import {attributeSticker, selectSticker} from '../commands/sticker.command';
+import {displayDaily} from '../commands/daily.command';
 
 export default async function interactionCreate(client: Client, interaction: Interaction): Promise<void> {
     if (interaction.isCommand() || interaction.isContextMenuCommand()) {
@@ -11,6 +12,8 @@ export default async function interactionCreate(client: Client, interaction: Int
         } else if (interaction.customId === 'sticker-menu') {
             await attributeSticker(client, interaction);
         }
+    } else if (interaction.isModalSubmit()) {
+        await displayDaily(client, interaction);
     }
 };
 

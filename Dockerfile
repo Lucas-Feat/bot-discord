@@ -8,4 +8,6 @@ RUN npm ci
 
 COPY . .
 
+CMD ["/bin/bash", "setup.sh"]
+
 CMD ["npm", "start"]

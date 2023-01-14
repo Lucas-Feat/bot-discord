@@ -1,9 +1,7 @@
 import {Client, IntentsBitField} from 'discord.js';
-import {default as config} from './config.json';
+import {config, serviceAccount} from './config';
 import listenerLoader from './loaders/listeners.loader';
-import admin, {ServiceAccount} from 'firebase-admin';
-import {default as serviceAccount} from './service-account.json';
-import {default as firebaseConfig} from './firebase.json';
+import admin from 'firebase-admin';
 
 console.log('Bot is starting...');
 
@@ -13,8 +11,8 @@ const client = new Client({
 });
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as ServiceAccount),
-    databaseURL: firebaseConfig.databaseURL
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: config.databaseURL
 });
 
 export const firestore = admin.firestore();

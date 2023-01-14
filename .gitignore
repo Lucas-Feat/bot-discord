@@ -1,5 +1,5 @@
 /.idea
-src/config.json
+src/config2.json
 /node_modules
 src/firebase.json
-src/service-account.json
+src/service-account2.json

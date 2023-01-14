@@ -24,18 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Decrypt Credentials
-        id: decrypt_credentials
-        uses: timheuer/base64-to-file@v1.2
-        with:
-          fileName: 'service-account.json'
-          encodedString: ${{ secrets.GCP_CREDENTIALS }}
-
       # Alternative option - authentication via credentials json
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
-          credentials_json: '${{ steps.decrypt_credentials.outputs.filePath }}'
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
 
       # Setup gcloud CLI
       - name: Set up Cloud SDK
@@ -46,13 +39,28 @@ jobs:
       - run: |-
           gcloud --quiet auth configure-docker
       # Build the Docker image
+      #      - name: Build
+      #        run: |
+      #          docker build . \
+      #            --build-arg CONFIG=${{ secrets.CONFIG }} \
+      #            --build-arg FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }} \
+      #            --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+
       - name: Build
-        run: |-
-          docker build --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" .
+        uses: docker/build-push-action@v2.8.0
+        with:
+          context: .
+          build-args: |
+            "CONFIG=${{ secrets.CONFIG }}"
+            "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          push: false
+          tags: "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
           docker push "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
       - name: Deploy
         run: |-
-          gcloud compute instances update-container "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" --container-image "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+          gcloud compute instances update-container "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" --container-image "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" \
+#          --container-env=[CONFIG=${{ secrets.CONFIG }},FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}]

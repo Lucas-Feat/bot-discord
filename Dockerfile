@@ -2,12 +2,9 @@ FROM node:16
 
 WORKDIR /usr/src/bot
 
-COPY package*.json ./
+COPY package*.json tsconfig.json ./
+COPY src ./src
 
 RUN npm ci
 
-COPY . .
-
-CMD ["/bin/bash", "setup.sh"]
-
-CMD ["npm", "start"]
+CMD ["npm","start"]

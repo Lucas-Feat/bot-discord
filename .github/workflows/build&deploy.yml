@@ -47,14 +47,14 @@ jobs:
       #            --tag "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
 
       - name: Build
-        uses: docker/build-push-action@v2.8.0
+        uses: docker/build-push-action@v3
         with:
           context: .
           build-args: |
             "CONFIG=${{ secrets.CONFIG }}"
             "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           push: false
-          tags: "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+          tags: 'gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA'
 
       # Push the Docker image to Google Container Registry
       - name: Publish

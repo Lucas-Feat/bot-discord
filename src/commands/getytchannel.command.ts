@@ -10,7 +10,7 @@ import {
 import {Command} from '../types/Command';
 import {getYoutubeChannel, getYoutubeChannelIds} from '../service/youtube.service';
 import {YoutubeChannel} from '../types/YoutubeChannel';
-import {default as config} from '../config.json';
+import {config} from '../config';
 import {findChannelById} from '../utils/utils';
 
 export const GetYoutubeChannels: Command = {

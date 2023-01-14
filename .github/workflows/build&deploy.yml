@@ -54,13 +54,14 @@ jobs:
             "CONFIG=${{ secrets.CONFIG }}"
             "FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           push: false
-          tags: 'gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA'
+          tags: |
+            "gcr.io/bot-discord-9e6d2/bot-discord-vm-image:latest"
 
       # Push the Docker image to Google Container Registry
       - name: Publish
         run: |-
-          docker push "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA"
+          docker push "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:latest"
       - name: Deploy
         run: |-
-          gcloud compute instances update-container "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" --container-image "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:$GITHUB_SHA" \
+          gcloud compute instances update-container "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" --container-image "gcr.io/$PROJECT_ID/$GCE_INSTANCE-image:latest" \
 #          --container-env=[CONFIG=${{ secrets.CONFIG }},FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }}]

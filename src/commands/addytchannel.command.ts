@@ -8,7 +8,7 @@ import {
 } from 'discord.js';
 import {Command} from '../types/Command';
 import axios from 'axios';
-import {default as config} from '../config.json';
+import {config} from '../config';
 import {saveNewYoutubeChannel} from '../service/youtube.service';
 
 export const AddytchannelCommand: Command = {

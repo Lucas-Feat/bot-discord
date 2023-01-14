@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import {Command} from '../types/Command';
 import {findChannelById, getUserColor} from '../utils/utils';
-import {default as config} from '../config.json';
+import {config} from '../config';
 import moment from 'moment';
 
 export const DailyCommand: Command = {

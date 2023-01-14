@@ -25,7 +25,6 @@
     "src/index.ts"
   ],
   "include": [
-    "src/config.json",
     "./**/*.ts"
   ],
   "exclude": [

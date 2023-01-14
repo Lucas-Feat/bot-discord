@@ -1,6 +1,6 @@
 import {Client, Colors, EmbedBuilder, TextChannel} from 'discord.js';
 import moment, {Moment} from 'moment';
-import {default as config} from '../config.json';
+import {config} from '../config';
 import axios from 'axios';
 import {videoConverter, YoutubeVideo} from '../types/YoutubeVideo';
 import {firestore} from '../index';
